@@ -1,0 +1,21 @@
+{
+  "name": "entregabackend2",
+  "version": "1.0.0",
+  "description": "Este proyecto es para una abogada y profesora de derecho ambiental, que quiere tener un sitio web para ofrecer sus servicios y mostrar su experiencia en el campo del derecho ambiental.",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [],
+  "author": "Mónica Lombardi",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
