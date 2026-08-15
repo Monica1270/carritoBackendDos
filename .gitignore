@@ -1,6 +1,7 @@
-#Node modules
+# Node
 node_modules/
-
-#Variables de entorno
+# Variables de entorno
 .env
 .env.*
+
+.DS_Store
