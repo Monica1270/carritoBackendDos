@@ -30,8 +30,7 @@
   npm install -g mongosh  
 
 ```
-##================================================================================   
+##===============================================================  
 ## Authors
 
-- https://github.com/Monica1270/estudioJuridicoLaura.git
-
+https://github.com/Monica1270/carritoBackendDos.git
