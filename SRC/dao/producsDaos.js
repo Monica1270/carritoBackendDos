@@ -1,7 +1,5 @@
-import { Router } from "express";
-export const productsRouter = Router();
 
-productsRouter.get("/", (req, res) => {
+/** dao es la capa de moedelo, luego lo llevo a mi controller */
 let productos=[
     { id: 1, code: 'PROD001', title: 'Camiseta Negra', stock: 20, price: 19.99, descrip: 'Camiseta de algodón', status: true },
     { id: 2, code: 'PROD002', title: 'Pantalón Jeans', stock: 15, price: 39.99, descrip: 'Jeans clásico', status: true },
@@ -14,33 +12,9 @@ let productos=[
     { id: 9, code: 'PROD009', title: 'Camiseta Celeste', stock: 32, price: 19.99, descrip: 'Camiseta de algodón', status: false },
     { id: 10, code: 'PROD010', title: 'Camisa Blanca manga corta', stock: 7, price: 28.99, descrip: 'Camisa manga corta', status: true },
 ]
-  res.setHeader("Content-Type", "application/json");
-    res.status(200).json({ message: "Listado de productos",productos});
 
-})
-
-productsRouter.get("/:id", (req, res) => {
-    let producto="producto 1"
-
-    res.setHeader("Content-Type", "application/json");
-    res.status(200).json({ producto });
-
-})
-
-productsRouter.post("/", (req, res) => {
-    let newProduct = "nuevo producto"   
-    res.setHeader("Content-Type", "application/json");      
-    res.status(200).json({ newProduct });
-})
-
-productsRouter.put("/:id", (req, res) => {
-    let updateProduct = "producto actualizado"   
-    res.setHeader("Content-Type", "application/json");      
-    res.status(200).json({ updateProduct });
-})
-
-productsRouter.delete("/:id", (req, res) => {
-    let deletedProduct = "producto eliminado"   
-    res.setHeader("Content-Type", "application/json");      
-    res.status(200).json({ deletedProduct });
-})
+export class ProductsDao {
+    async get (){
+        return productos;
+    }
+}
