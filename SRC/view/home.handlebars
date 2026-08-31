@@ -1,0 +1,64 @@
+<h2 class="mb-4 text-center fw-bold">Nuestro Catálogo</h2>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {{#each products}}
+        <div class="col">
+            <div class="card h-100 shadow-sm product-card">
+                {{#if this.thumbnails.[0]}}
+                    <img src="{{this.thumbnails.[0]}}" class="card-img-top" alt="{{this.title}}" style="height: 200px; object-fit: cover;">
+                {{else}}
+                    <img src="https://placehold.co/600x400?text=Sin+Imagen" class="card-img-top" alt="Sin imagen" style="height: 200px; object-fit: cover;">
+                {{/if}}
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold">{{this.title}}</h5>
+                    <p class="card-text text-muted flex-grow-1">{{this.description}}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="fs-4 fw-bold text-success">${{this.price}}</span>
+                        <span class="badge bg-secondary">Stock: {{this.stock}}</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 p-3">
+                    <button onclick="addToCart('{{this._id}}')" class="btn btn-primary w-100">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+</div>
+
+<script>
+async function addToCart(productId) {
+  let cartId = localStorage.getItem('cartId');
+
+  // Si no hay carrito guardado, crea uno nuevo en la API
+  if (!cartId) {
+    try {
+      const resCart = await fetch('/api/carts', { method: 'POST' });
+      const dataCart = await resCart.json();
+      cartId = dataCart.payload._id;
+      localStorage.setItem('cartId', cartId);
+    } catch (err) {
+      return alert('Error al inicializar el carrito');
+    }
+  }
+
+  try {
+    const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert('¡Producto agregado al carrito con éxito!');
+    } else {
+      alert('Error: ' + data.message);
+    }
+  } catch (error) {
+    console.error('Error al agregar al carrito:', error);
+  }
+}
+</script>

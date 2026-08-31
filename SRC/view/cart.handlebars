@@ -1,0 +1,69 @@
+<h2 class="mb-4 text-center fw-bold">Tu Carrito de Compras</h2>
+
+{{#if cart.products.length}}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Producto</th>
+          <th>Precio Un.</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each cart.products}}
+          <tr>
+            <td>
+              <strong>{{this.product.title}}</strong>
+            </td>
+            <td>${{this.product.price}}</td>
+            <td>{{this.quantity}}</td>
+            <td class="fw-bold text-success">
+              ${{multiply this.product.price this.quantity}}
+            </td>
+            <td class="text-center">
+              <button onclick="removeFromCart('{{../cart._id}}', '{{this.product._id}}')" class="btn btn-danger btn-sm">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <button onclick="emptyCart('{{cart._id}}')" class="btn btn-outline-danger">
+      Vaciar Carrito
+    </button>
+    <a href="/products" class="btn btn-secondary">Seguir Comprando</a>
+  </div>
+{{else}}
+  <div class="alert alert-info text-center py-4" role="alert">
+    <h4>Tu carrito está vacío 🛒</h4>
+    <p class="mb-3">Parece que aún no has agregado productos.</p>
+    <a href="/products" class="btn btn-primary">Ir al catálogo</a>
+  </div>
+{{/if}}
+
+<script>
+async function removeFromCart(cartId, productId) {
+  try {
+    const res = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'DELETE' });
+    if (res.ok) location.reload();
+  } catch (err) {
+    console.error('Error al eliminar el producto:', err);
+  }
+}
+
+async function emptyCart(cartId) {
+  try {
+    const res = await fetch(`/api/carts/${cartId}`, { method: 'DELETE' });
+    if (res.ok) location.reload();
+  } catch (err) {
+    console.error('Error al vaciar el carrito:', err);
+  }
+}
+</script>

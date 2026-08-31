@@ -1,20 +1,16 @@
 
-/** con este👇proceso hago que se cargue la varialbe de entorno que tengo en el archivo .env*/
-process.loadEnvFile("./.env")
-/** Se crea un objeto se crea propiedades por cada una de las variables de entorno
- */
+import dotenv from "dotenv";
+
+dotenv.config();
+
 export const config = {
-    /** estos process se conencta con el sistema operativo de node
-     * si nosotros ejecutamos node server.js . Esto valida que este bien el codigo
-     * lo tengo que importar a app.js, 
-     */
-    general:{
-          PORT: process.env.PORT,
-    SECRET:process.env.SECRET,
-    },
-  database:{
-    MONGO_URL:process.env.MONGO_URL
+  general: {
+    PORT: Number(process.env.PORT) || 8080,
+    SECRET: process.env.SECRET || "1234",
+    NODE_ENV: process.env.NODE_ENV || "development",
   },
-    
-}
-console.log(config)
+  database: {
+    MONGO_URI: process.env.MONGO_URI || "",
+    DB_NAME: process.env.DB_NAME || "",
+  },
+};

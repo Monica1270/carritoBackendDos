@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 px-4 shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="/products">🛒 CarritoBackendDos</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" href="/products">Inicio / Catálogo</a>
+        </li>
+      </ul>
+      <div class="d-flex">
+        <!-- Enlace al carrito usando el ID dinámico o navegando a tu ruta de vista -->
+        <a id="cartLink" href="/cart-view/DEFAULT_CART_ID" class="btn btn-outline-light position-relative">
+          Ver Carrito 🛒
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Actualiza el link del carrito si existe un cartId en localStorage
+  const savedCartId = localStorage.getItem('cartId');
+  if (savedCartId) {
+    document.getElementById('cartLink').href = `/cart-view/${savedCartId}`;
+  }
+</script>

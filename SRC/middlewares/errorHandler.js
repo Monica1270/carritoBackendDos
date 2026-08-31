@@ -1,5 +1,12 @@
-export const errorHandler=(error, req, res, next)=>{
+export const errorHandler = (error, req, res, next) => {
+  console.error('❌ Error real:', error);
+  res.setHeader('Content-Type', 'application/json');
 
-    res.setHeader('Content-Type','application/json');
-    return res.status(400).json({error:`Error interno del servidor`})
-}
+  const status = error.statusCode || error.status || 500;
+  const message = error.message || 'Error interno del servidor';
+
+  return res.status(status).json({
+    error: message,
+    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+  });
+};
