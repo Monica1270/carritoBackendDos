@@ -8,6 +8,8 @@ export const config = {
     PORT: Number(process.env.PORT) || 8080,
     SECRET: process.env.SECRET || "1234",
     NODE_ENV: process.env.NODE_ENV || "development",
+    JWT_SECRET: process.env.JWT_SECRET || process.env.SECRET || "coderSecret",
+
   },
   database: {
     MONGO_URI: process.env.MONGO_URI || "",

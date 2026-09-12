@@ -1,90 +1,91 @@
-# 🛒 Carrito de Compras - Monica Lombardi (Backend)
+# 🎟️ Plataforma de Gestión de Eventos - API REST (Backend II)
 
-¡Bienvenido al repositorio del Backend para el Carrito de Compras de Monica Lombardi! Esta aplicación es una plataforma robusta diseñada para gestionar un catálogo dinámico de ropa deportiva, calzado y artículos de decoración, ofreciendo una experiencia interactiva en tiempo real.
-
----
-
-## 🌟 Características Principales
-
-* **Catálogo Variado:** Gestión de productos divididos en categorías como Ropa Deportiva para Mujer (calzas, tops, remeras), Calzado (urbano y deportivo) y Decoración (cuadros y láminas).
-* **Carrito en Tiempo Real:** Gestión e interacción inmediata mediante WebSockets para añadir, actualizar o quitar productos sin recargar la página.
-* **Autenticación Segura:** Sistema de sesiones y encriptación de contraseñas para proteger las cuentas de los usuarios.
-* **Diseño Dinámico:** Renderizado de pantallas en el servidor utilizando plantillas reutilizables.
-* **Subida de Archivos:** Soporte para cargar imágenes de productos de forma local y eficiente.
+API REST desarrollada con **Node.js** y **Express** para la gestión integral de eventos, usuarios e inscripciones, estructurada bajo un patrón de diseño en capas para garantizar modularidad, mantenibilidad y escalabilidad.
 
 ---
 
-## 📦 Tecnologías y Paquetes Utilizados
+## 🏛️ Arquitectura del Proyecto (Diseño en Capas)
 
-* **Express:** Armazón principal del servidor web para controlar las rutas y peticiones del sistema.
-* **Socket.io:** Habilita la comunicación bidireccional en tiempo real para la actualización del carrito.
-* **Mongoose:** Conector y modelador de datos para interactuar con la base de datos de MongoDB.
-* **Express Handlebars:** Motor de plantillas que mezcla código HTML con datos dinámicos del servidor.
-* **Express Session:** Middleware para mantener la sesión de los usuarios activa entre páginas.
-* **Bcrypt:** Herramienta de seguridad para encriptar las contraseñas antes de guardarlas.
-* **Multer:** Intermediario especializado en procesar la subida de imágenes de los productos.
+El proyecto sigue una separación estricta de responsabilidades organizada dentro del directorio `src/`:
+
+- **`src/config/`**: Configuración centralizada de variables de entorno (`dotenv`) y conexión a MongoDB (`Mongoose`).
+- **`src/routes/`**: Definición de rutas y endpoints de la API (`events.router.js`, `sessions.router.js`).
+- **`src/controllers/`**: Recepción de peticiones HTTP (`req`), delegación a la capa de servicios y retorno de respuestas normalizadas (`res`).
+- **`src/services/`**: Implementación de las reglas y lógica de negocio de la aplicación.
+- **`src/repositories/`**: Capa intermedia que desacopla la lógica de negocio de la fuente de datos (Patrón Repository).
+- **`src/dao/`**: Data Access Object para la interacción directa con la base de datos.
+- **`src/models/`**: Definición de esquemas y modelos de Mongoose (`User.js`, `Event.js`).
+- **`src/middlewares/`**: Middlewares globales y de ruta (autenticación, validación, manejo centralizado de errores).
+- **`src/utils/`**: Funciones auxiliares y herramientas utilitarias.
+- **`src/app.js`**: Configuración de Express, middlewares base y montaje de routers.
+- **`src/server.js`**: Punto de entrada que inicializa la base de datos y levanta el servidor HTTP.
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📦 Tecnologías Utilizadas
+
+- **Node.js** (Módulos ES - ESM)
+- **Express.js**
+- **MongoDB** & **Mongoose**
+- **Dotenv**
+- **JSON Web Tokens (JWT)** / **Bcrypt** (Autenticación y seguridad)
+
+---
+
+## 📁 Estructura del Directorio
 
 ```text
 carritoBackendDos/
-├── config/             # Configuraciones generales del entorno (.env)
-├── controllers/        # Lógica de negocio y control de peticiones (Products)
-├── dao/                # Data Access Objects (Interacción directa con la BD)
-├── middlewares/        # Validaciones de seguridad, logs y manejo de errores
-├── models/             # Esquemas de datos (Productos y Usuarios)
-├── public/             # Archivos estáticos disponibles públicamente (CSS, JS, imágenes)
-├── repositories/       # Capa intermedia de acceso a datos (Patrón Repository)
-├── routes/             # Definición de rutas y endpoints de la API (Products, Sessions)
-├── services/           # Servicios con lógica de negocio específica
-├── src/                # Archivos fuente adicionales
-├── utils/              # Funciones utilitarias y herramientas globales
-├── view/               # Vistas del frontend de la aplicación
-│   ├── layout/         # Plantillas base (main.handlebars)
-│   ├── partial/        # Componentes repetibles (header.handlebars)
-│   ├── cart.handlebars # Vista del carrito de compras
-│   └── home.handlebars # Vista principal del catálogo
-├── .env                # Variables de entorno secretas
-├── app.js              # Punto de entrada principal de la aplicación
-└── package.json        # Configuración de dependencias del proyecto
-```
-
+├── src/
+│   ├── config/             # Configuración de entorno y conexión a BD
+│   ├── controllers/        # Controladores (Events, Sessions)
+│   ├── dao/                # Data Access Objects
+│   ├── middlewares/        # Middlewares de aplicación y ruta
+│   ├── models/             # Modelos de datos (Event, User)
+│   ├── repositories/       # Repositorios de datos
+│   ├── routes/             # Enrutadores principales
+│   ├── services/           # Lógica de negocio
+│   ├── utils/              # Utilidades globales
+│   ├── app.js              # Configuración de la app Express
+│   └── server.js           # Inicio del servidor HTTP
+├── .env.example            # Plantilla de variables de entorno
+├── .gitignore              # Archivos y carpetas ignorados por Git
+├── package.json            # Dependencias y scripts del proyecto
+└── README.md               # Documentación del proyecto
+'''
 ---
-
-## 🔧 Instalación y Arranque
-
-Seguí estos pasos para clonar y ejecutar el proyecto de forma local:
-
+##🔧 Instalación y Puesta en Marcha
 ### 1. Clonar el repositorio
-```bash
-git clone https://github.com
+git clone <URL_DE_TU_REPOSITORIO>
 cd carritoBackendDos
-```
 
-### 2. Instalar las dependencias
-```bash
+### 2. Instalar dependencias
 npm install
-```
 
 ### 3. Configurar variables de entorno
-Crea un archivo `.env` en la raíz del proyecto basándote en `.env.example` y completa tus datos de conexión (como la URL de tu base de datos MongoDB).
+Crea un archivo .env en la raíz del proyecto basándote en .env.example:
+bash
+cp .env.example .env
 
-### 4. Iniciar el servidor
-* **Modo Desarrollo (con reinicio automático):**
-  ```bash
-  npm run dev
-  ```
-* **Modo Producción:**
-  ```bash
-  npm start
-  ```
+Variables requeridas en .env:
+env
+PORT=8080
+NODE_ENV=development
+MONGO_URI=mongodb+srv://<usuario>:<password>@cluster0.mongodb.net/entregaFinalB?retryWrites=true&w=majority
+DB_NAME=entregaFinalB
+JWT_SECRET=tuClaveSecretaParaTokens
 
----
+### 4. Ejecutar el servidor
+Modo desarrollo (con recarga automática):
+npm run dev
 
-## 📩 Contacto y Consultas
+Modo producción:
+npm start
 
-Si tenés dudas o querés realizar una consulta sobre el desarrollo del proyecto, podés escribirme a:
 
-* 📧 **Email:** tuemail@ejemplo.com
+📌 Endpoints Base Disponibles
+Método	Endpoint	Descripción	Respuesta Exitosa
+GET	/api/health	Estado y verificación de actividad del servidor	{ "status": "ok", "message": "Servidor activo" }
+GET	/api/events	Listado inicial de eventos	{ "status": "success", "payload": [] }
+POST	/api/sessions/register	Registro de nuevos usuarios	Estructura base configurada
+POST	/api/sessions/login

@@ -1,6 +1,5 @@
 import express from 'express';
 import productsRouter from './routes/productsRouter.js';
-
 import { logger } from './middlewares/log.js';
 import { config } from './config/config.js';
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -9,6 +8,7 @@ import { connectDB } from './config/db.config.js';
 //import {handlebars} from 'express-handlebars';
 import { engine } from 'express-handlebars';
 import path from 'path';
+import sessions from 'express-session';
 import { router as sessionsRouter } from './routes/sessionsRouter.js';// Agrega esta línea arriba de todo en tu src/app.js:
 import { fileURLToPath } from 'url';
 import { dirname } from 'path'; // Agrega esta también si usas __dirname abajo
@@ -24,7 +24,12 @@ connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api', sessionsRouter);
+app.use(sessions({
+  secret: config.general.SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+app.use('/api/sessions', sessionsRouter);
 app.use('/api/products', productsRouter);
 
 

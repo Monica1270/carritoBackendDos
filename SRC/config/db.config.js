@@ -1,20 +1,16 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import {config} from './config.js';
 
-// Nos aseguramos de tener cargadas las variables antes de acceder a ellas
-dotenv.config();
-
-const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
-
+const MONGODB_URI = config.database.MONGO_URI;
+export const connectDB = async () => {
 if (!MONGODB_URI) {
   console.error('❌ ERROR CRÍTICO: No se encontró la variable de entorno MONGO_URI o MONGODB_URI');
-  process.exit(1); // Patrón Fail-Fast
+  return;
 }
-
 /**
  * Función asíncrona para iniciar la conexión con la base de datos
  */
-export const connectDB = async () => {
+/* export const connectDB = async () => { */
   try {
     // Conectamos usando la URI configurada en variables de entorno.
     // Aunque Mongoose v8 ya habilita de forma predeterminada el nuevo analizador y motor de topología,
