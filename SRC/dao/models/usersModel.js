@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+/* import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -34,4 +34,4 @@ const userSchema = new mongoose.Schema({
     timestamps: true, // Agrega automáticamente campos createdAt y updatedAt
 });
 
-export const userModel = mongoose.model("User", userSchema);
+export const userModel = mongoose.model("User", userSchema); */

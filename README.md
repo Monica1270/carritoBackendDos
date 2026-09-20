@@ -3,8 +3,7 @@
 API REST desarrollada con **Node.js** y **Express** para la gestión integral de eventos, usuarios e inscripciones, estructurada bajo un patrón de diseño en capas para garantizar modularidad, mantenibilidad y escalabilidad.
 
 ---
-
-## 🏛️ Arquitectura del Proyecto (Diseño en Capas)
+##🏛️ Arquitectura del Proyecto (Diseño en Capas)
 
 El proyecto sigue una separación estricta de responsabilidades organizada dentro del directorio `src/`:
 
@@ -56,36 +55,44 @@ carritoBackendDos/
 ---
 ##🔧 Instalación y Puesta en Marcha
 ### 1. Clonar el repositorio
+'''bash
 git clone <URL_DE_TU_REPOSITORIO>
 cd carritoBackendDos
+'''
 
 ### 2. Instalar dependencias
+'''bash
 npm install
+'''
 
 ### 3. Configurar variables de entorno
 Crea un archivo .env en la raíz del proyecto basándote en .env.example:
-bash
+'''bash
 cp .env.example .env
-
+'''
 Variables requeridas en .env:
-env
+'''env
 PORT=8080
 NODE_ENV=development
 MONGO_URI=mongodb+srv://<usuario>:<password>@cluster0.mongodb.net/entregaFinalB?retryWrites=true&w=majority
 DB_NAME=entregaFinalB
 JWT_SECRET=tuClaveSecretaParaTokens
+'''
 
 ### 4. Ejecutar el servidor
-Modo desarrollo (con recarga automática):
+-**Modo desarrollo (con recarga automática):**
+'''bash
 npm run dev
-
-Modo producción:
+'''
+-**Modo producción:**
+'''bash
 npm start
+'''
 
-
-📌 Endpoints Base Disponibles
-Método	Endpoint	Descripción	Respuesta Exitosa
-GET	/api/health	Estado y verificación de actividad del servidor	{ "status": "ok", "message": "Servidor activo" }
-GET	/api/events	Listado inicial de eventos	{ "status": "success", "payload": [] }
-POST	/api/sessions/register	Registro de nuevos usuarios	Estructura base configurada
-POST	/api/sessions/login
+## 📌 Endpoints Base Disponibles
+| Método | Endpoint | Descripción | Respuesta Exitosa |
+|---|---|---|---|
+| `GET` | `/api/health` | Estado y verificación de actividad del servidor | `{ "status": "ok", "message": "Servidor activo" }` |
+| `GET` | `/api/events` | Listado inicial de eventos | `{ "status": "success", "payload": [] }` |
+| `POST` | `/api/sessions/register` | Registro de nuevos usuarios | Estructura base configurada |
+| `POST` | `/api/sessions/login` | Inicio de sesión y generación de token | Estructura base configurada |

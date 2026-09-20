@@ -47,6 +47,7 @@ router.get("/", async (req, res, next) => {
       `${baseUrl}?limit=${limit}&page=${p}${query ? `&query=${encodeURIComponent(query)}` : ""}${sort ? `&sort=${sort}` : ""}`;
 
     res.status(200).json({
+      usuarioConsulta: req.session.user.nombre,
       status: "success",
       payload: result.payload,
       totalPages: result.totalPages,
@@ -86,6 +87,7 @@ router.get("/:id", async (req, res, next) => {
     res.status(200).json({
       status: "success",
       payload: product,
+      
     });
   } catch (error) {
     next(error);

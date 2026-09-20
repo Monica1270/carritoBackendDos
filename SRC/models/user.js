@@ -5,13 +5,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    default: ''
+    minlength: [3, "El nombre debe tener al menos 3 caracteres"],
   },
   last_name: {
     type: String,
     required: true,
     trim: true,
-    default: 'Sin apellido'
+    minlength: [3, "El apellido debe tener al menos 3 caracteres"]
   },
   email: {
     type: String,
@@ -22,7 +22,8 @@ const userSchema = new mongoose.Schema({
 },
   password: {
     type: String,
-    required: true
+    required: true,
+    minlength: 10
   },
   role: {
     type: String,
