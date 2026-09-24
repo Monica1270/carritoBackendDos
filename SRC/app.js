@@ -12,6 +12,7 @@ import { engine } from 'express-handlebars';
 import path from 'path';
 import sessions from 'express-session';
 import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
 import MongoStore from 'connect-mongo';
 import { router as sessionsRouter } from './routes/sessionsRouter.js';
 import { fileURLToPath } from 'url';
@@ -28,6 +29,7 @@ connectDB();
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(sessions({
   secret: config.general.SECRET,
   saveUninitialized: false,

@@ -28,29 +28,68 @@ El proyecto sigue una separación estricta de responsabilidades organizada dentr
 - **MongoDB** & **Mongoose**
 - **Dotenv**
 - **JSON Web Tokens (JWT)** / **Bcrypt** (Autenticación y seguridad)
+- **cookie-parser
 
 ---
 
 ## 📁 Estructura del Directorio
 
 ```text
+## 📁 Estructura de los Proyectos
+
+El ecosistema está compuesto por dos soluciones desarrolladas bajo una arquitectura limpia y organizada en capas:
+
+### 1. Sistema Principal (`carritoBackendDos/`)
+Utiliza un patrón robusto con separación por **DAO (Data Access Objects)** y **Repositorios** para desacoplar totalmente la base de datos de la lógica de negocio.
+
+```text
 carritoBackendDos/
 ├── src/
 │   ├── config/             # Configuración de entorno y conexión a BD
-│   ├── controllers/        # Controladores (Events, Sessions)
-│   ├── dao/                # Data Access Objects
+│   ├── controllers/        # Controladores (Events, Sessions, index)
+│   ├── dao/                # Data Access Objects (Persistencia)
+│   │     └── models/       # Modelo de usuario específico del DAO
+│   ├── dto/                # Data Transfer Objects (Transformación de datos)
 │   ├── middlewares/        # Middlewares de aplicación y ruta
-│   ├── models/             # Modelos de datos (Event, User)
-│   ├── repositories/       # Repositorios de datos
-│   ├── routes/             # Enrutadores principales
-│   ├── services/           # Lógica de negocio
-│   ├── utils/              # Utilidades globales
-│   ├── app.js              # Configuración de la app Express
-│   └── server.js           # Inicio del servidor HTTP
+│   ├── models/             # Modelos de datos globales (Event, User)
+│   ├── repositories/       # Repositorios (Capa de abstracción de datos)
+│   ├── routes/             # Enrutadores principales (Definición de rutas)
+│   ├── services/           # Lógica de negocio avanzada
+│   ├── utils/              # Utilidades globales y funciones helper
+│   ├── app.js              # Configuración y Middlewares de Express
+│   └── server.js           # Inicialización y escucha del servidor HTTP
 ├── .env.example            # Plantilla de variables de entorno
-├── .gitignore              # Archivos y carpetas ignorados por Git
+├── .gitignore              # Archivos ignorados por Git
 ├── package.json            # Dependencias y scripts del proyecto
-└── README.md               # Documentación del proyecto
+└── README.md               # Documentación del sistema
+```
+
+### 2. Módulo de Autenticación (`proyecto-eventos/`)
+Una estructura ágil enfocada en la gestión de sesiones mediante **JWT (JSON Web Tokens)** y persistencia directa con **Mongoose**.
+
+```text
+proyecto-eventos/
+├── src/
+│   ├── app.js              # Punto de entrada y configuración de Express
+│   ├── config/
+│   │   └── db.js           # Conexión centralizada a MongoDB
+│   ├── models/
+│   │   └── User.js         # Esquema de datos de Usuario (Mongoose)
+│   ├── routes/
+│   │   └── sessions.router.js     # Definición de rutas de autenticación
+│   ├── controllers/
+│   │   └── sessions.controller.js # Control de flujo y respuestas de sesión
+│   ├── middlewares/
+│   │   └── auth.middleware.js     # Protección de rutas y verificación de sesión
+│   └── utils/
+│       ├── jwt.js          # Helpers para firmar y verificar JWT
+│       └── hash.js         # Utilidades de encriptación con Bcrypt
+├── .env.example            # Plantilla de variables de entorno
+├── .gitignore              # Archivos ignorados por Git
+├── package.json            # Scripts y dependencias (Bcrypt, JWT, Mongoose)
+└── README.md               # Documentación del módulo
+```
+
 '''
 ---
 ##🔧 Instalación y Puesta en Marcha
@@ -90,9 +129,12 @@ npm start
 '''
 
 ## 📌 Endpoints Base Disponibles
-| Método | Endpoint | Descripción | Respuesta Exitosa |
+
+| Método | Endpoint | Descripción | Respuesta Exitosa (Estructura) |
 |---|---|---|---|
-| `GET` | `/api/health` | Estado y verificación de actividad del servidor | `{ "status": "ok", "message": "Servidor activo" }` |
+| `GET` | `/api/health` | Estado y verificación de actividad del servidor | `{ "status": "ok", "message": "..." }` |
 | `GET` | `/api/events` | Listado inicial de eventos | `{ "status": "success", "payload": [] }` |
-| `POST` | `/api/sessions/register` | Registro de nuevos usuarios | Estructura base configurada |
-| `POST` | `/api/sessions/login` | Inicio de sesión y generación de token | Estructura base configurada |
+| `POST` | `/api/sessions/register` | Registro de nuevos usuarios (Usa `UsersDTO`) | `{ "status": "success", "message": "...", "newUser": {...} }` |
+| `POST` | `/api/sessions/login` | Inicio de sesión y generación de sesión/token | `{ "status": "success", "message": "..." }` |
+| `POST` | `/api/sessions/logout` | Cierre de sesión y destrucción de sesión/cookie | `{ "status": "success", "message": "..." }` |
+| `GET` | `/api/sessions/current` | Obtiene los datos del usuario logueado actualmente | `{ "status": "success", "user": {...} }` |
