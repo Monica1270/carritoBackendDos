@@ -29,6 +29,10 @@ El proyecto sigue una separación estricta de responsabilidades organizada dentr
 - **Dotenv**
 - **JSON Web Tokens (JWT)** / **Bcrypt** (Autenticación y seguridad)
 - **cookie-parser
+- **passport
+- **passport-jwt
+- **passport-local
+
 
 ---
 

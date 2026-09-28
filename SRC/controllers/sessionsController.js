@@ -1,9 +1,12 @@
-import { usersDao } from "./index.js";
+import { UsersDAO} from "../dao/UsersDAO.js";
 import { hashPassword, validaHash } from "../utils/hash.js";
 import { UsersDTO } from "../dto/usersDto.js";
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { config } from "../config/config.js";
 
+//Instanciamos la clase Dao
+const userDao = new UsersDAO
 
 // configuracion de las cookes de autenticacion
 const COOKIE_OPTIONS = {
@@ -46,37 +49,40 @@ export const register = async (req, res) => {
 //=========Login=======
 
 export const login = async (req, res) => {
-  let{ email, password } = req.body;
+  /* let { email, password } = req.body;
 
   if (!email || !password) {
-  res.setHeader('Content-Type', 'application/json');
-    return res.status(400).json({ status: 'error', message: 'email | password son  requeridos' });
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(400).json({ status: 'error', message: 'email | password son requeridos' });
   }
 
-  try {
-  const user = await usersDao.getBy({ email});
-
-    if (!user)  {
+console.log("Intentando loguin para:", email);
+ */
+   try { 
+       const user=req.user
+if (!user) {
       res.setHeader('Content-Type', 'application/json');
-      return res.status(401).json({status: 'error', message: 'Credenciales inválidas' });
+      return res.status(401).json({ status: 'error', message: 'Usuario no autenticado' });
     }
 
-    if (!validaHash(password, user.password)) {
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(401).json({ status: 'error', message: 'Credenciales inválidas' });
-    }
-       const payload = { 
-        id: user._id, 
-        email: user.email, 
-        role: user.role || 'user'
-      };
-      const token = jwt.sign(payload, config.general.JWT_SECRET, { expiresIn: '1h' });
-      res.cookie('currentUser', token, COOKIE_OPTIONS);
-      return res.status(200).json({
-        status: 'success',
-        message: `Login exitoso para ${user.first_name}`, 
-      });
-    }catch (error) {
+
+//armando el payload para el token
+  const payload = {
+      id: user._id,
+      email: user.email,
+      role: user.role || 'user'
+    }; 
+
+    const token = jwt.sign(payload, config.general.JWT_SECRET, { expiresIn: '1h' });
+
+    /* const userResponse = {...user._doc ||user};
+     delete userResponse.password;*/
+
+    res.cookie('currentUser', token, COOKIE_OPTIONS);
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(200).json({message: 'Login exitoso', user});
+    
+  } catch (error) {
     console.error(error);
     res.setHeader('Content-Type', 'application/json');
     return res.status(500).json({ status: 'error', message: 'internal server error' });

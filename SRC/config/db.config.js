@@ -23,8 +23,8 @@ if (!MONGODB_URI) {
 
 const db = mongoose.connection;
 
-// Ocultamos la contraseña para no mostrarla en consola
-const maskedURI = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+// Ocultamos la cntraseña para no mostrarla en consola
+const maskedURI = MONGODB_URI ? MONGODB_URI.replace(/:([^@]+)@/, ':****@'): '';
 
 // Manejadores de Eventos del Ciclo de Vida de la Conexión (Requerimiento del temario)
 db.on('connected', () => {
