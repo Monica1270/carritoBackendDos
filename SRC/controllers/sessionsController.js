@@ -1,12 +1,12 @@
-import { UsersDAO} from "../dao/UsersDAO.js";
-import { hashPassword, validaHash } from "../utils/hash.js";
+//import { UsersDAO} from "../dao/UsersDAO.js";
+//import { hashPassword, validaHash } from "../utils/hash.js";
 import { UsersDTO } from "../dto/usersDto.js";
-import bcrypt from 'bcrypt';
+//import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { config } from "../config/config.js";
 
 //Instanciamos la clase Dao
-const userDao = new UsersDAO
+//const usersDao = new UsersDAO
 
 // configuracion de las cookes de autenticacion
 const COOKIE_OPTIONS = {
@@ -15,49 +15,32 @@ const COOKIE_OPTIONS = {
   sameSite: 'lax',
   maxAge: 3600000 // 1 hora en milisegundos
 };
+// ========= Register (delegado en Passport) =========
 
 export const register = async (req, res) => {
-  /** Hago las validaciones necesarias */
-  let { first_name, last_name, email, password } = req.body;
-
-  if (!first_name || !email || !password) {
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(400).json({ error: 'first_name| email | password son requeridos' });
-  } 
-  //resto de las validaciones
   try {
-    let existe = await usersDao.getBy({email});
-    if (existe) {
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(400).json({ error: `El correo email ${email} ya está en la BD` });
-    } 
+    if (!req.user) {
+      res.setHeader("Content-Type", "application/json");
+      return res.status(400).json({ status: "error", message: "No se pudo registrar el usuario" });
+    }
 
-     const hashedPassword = hashPassword(password);
-    const newUser = await usersDao.create({ first_name, last_name, email, password: hashedPassword });
-    const usuarioDto = new UsersDTO(newUser) ;
+    res.setHeader("Content-Type", "application/json");
     return res.status(201).json({
-      Status: 'success',
-      message: `Registro exitoso para ${first_name}`,
-      newUser: usuarioDto
+      status: "success",
+      message: `Registro exitoso para ${req.user.first_name}`,
+      newUser: new UsersDTO(req.user)
     });
   } catch (error) {
-    console.log(error);
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(500).json({ status: 'error', message: 'internal server error' });
+    console.error(error);
+    res.setHeader("Content-Type", "application/json");
+    return res.status(500).json({ status: "error", message: "internal server error" });
   }
-}
+};
+
 //=========Login=======
 
 export const login = async (req, res) => {
-  /* let { email, password } = req.body;
 
-  if (!email || !password) {
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(400).json({ status: 'error', message: 'email | password son requeridos' });
-  }
-
-console.log("Intentando loguin para:", email);
- */
    try { 
        const user=req.user
 if (!user) {
@@ -75,12 +58,14 @@ if (!user) {
 
     const token = jwt.sign(payload, config.general.JWT_SECRET, { expiresIn: '1h' });
 
-    /* const userResponse = {...user._doc ||user};
-     delete userResponse.password;*/
 
     res.cookie('currentUser', token, COOKIE_OPTIONS);
     res.setHeader('Content-Type', 'application/json');
-    return res.status(200).json({message: 'Login exitoso', user});
+    return res.status(200).json
+    ({status:"success",
+      message:"Login exitoso",
+      user: new UsersDTO(user)
+    });
     
   } catch (error) {
     console.error(error);
@@ -90,21 +75,6 @@ if (!user) {
 };
     
 
-    //=====USUARIO==========
-   /** const usuarioDto = { ...new UsersDTO(user) };
-     const token = jwt.sign(usuarioDto, config.general.JWT_SECRET, { expiresIn: '1h' }); 
-    res.cookie('token', token, COOKIE_OPTIONS);
-    return res.status(200).json({
-      message: `Login exitoso para ${user.first_name}`,
-      user: new UsersDTO(user),
-      });
-} catch (error) {
-    console.error(error);
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(500).json({ error: 'internal server error' });
-  }
-}*/
-
 //=========Logout=======
 export const logout = async (req, res) => {
 try {
@@ -113,10 +83,11 @@ return res.status(200).json({ status: 'success', message: 'Logout exitoso' });
   } catch (error) {
     console.error(error);
     res.setHeader('Content-Type', 'application/json');
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).json({ status: "error", message: "internal server error" });
   }
-    
+  
   };
+  //===========Current==========
 export const current =(req, res) => {
   res.setHeader('Content-Type','application/json');
   return res.status(200).json({ 
