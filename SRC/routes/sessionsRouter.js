@@ -5,9 +5,11 @@ import passport from "passport";
 
 
 export const router = Router()
+
 //=======Registro delegado en la estrategia""register", de Passport====
 router.post('/register',  passport.authenticate("register", { session: false, failureRedirect: "/error" }),
   register);
+
 //======Login autenticado con la estrategia "login" de Passport
 router.post('/login',
     passport.authenticate("login",{session:false, failureRedirect:"/error"}),

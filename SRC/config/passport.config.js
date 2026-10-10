@@ -4,38 +4,60 @@ import local from "passport-local";
 import bcrypt from "bcrypt";
 import { UsersDAO } from "../dao/UsersDAO.js";
 import { config } from "./config.js";
+import github from "passport-github2";
+
 
 
 
 const usersDAO = new UsersDAO()
 
 const buscaToken = (req) => {
-    let token = null
-    if (req.cookies.currentUser) {
-        token = req.cookies.currentUser
-    }
-    return token
+  let token = null
+  if (req.cookies.currentUser) {
+    token = req.cookies.currentUser
+  }
+  return token
 }
 
-export const inicializarPassport = () => {
-    // paso uno (uso current porque lo solicita coder)
-    passport.use("current", new passportJWT.Strategy(
-        {
-            secretOrKey: config.general.JWT_SECRET,
-            jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([buscaToken])
-        },
-        async (payLoad, done) => {
+export const initPassport = () => {
+  passport.use("github", new github.Strategy(
+    {
+      callbackURL: "https://localhost:8080/api/sessions/callbackGithub",
+      clientSecret: "3020be7223f0a9a885e41182dd6b962a6fbb3e5e",
+      clientID: " Iv23li9ZJ9SGMM2iA7d8",
+    },
+    async(t1, t2, profile, done) => {
+      try {
+        console.log(profile)
+        return done(null, {_id: profile.id, name: profile.displayName, email: profile.emails[0].value})
+    }catch (error) {
+      return done(error)
+    } 
+  }
+)
+  ) 
+}
 
-            try {
-                return done(null, payLoad)
-            }
-            catch (error) {
-                return done(error)
-            }
-        }
-    )
-    )
-    // 2. Estrategia Local "register"
+
+export const inicializarPassport = () => {
+  // paso uno (uso current porque lo solicita coder)
+  passport.use("current", new passportJWT.Strategy(
+    {
+      secretOrKey: config.general.JWT_SECRET,
+      jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([buscaToken])
+    },
+    async (payLoad, done) => {
+
+      try {
+        return done(null, payLoad)
+      }
+      catch (error) {
+        return done(error)
+      }
+    }
+  )
+  )
+  // 2. Estrategia Local "register"
   passport.use(
     "register",
     new local.Strategy(
@@ -70,54 +92,55 @@ export const inicializarPassport = () => {
     )
   );
 
-    //Estragegia login
-    passport.use("login", new local.Strategy(
-        {
-            usernameField: "email",
-            passReqToCallback: true,
-        },
-        async (req, username, password, done) => {
+  //Estragegia login
+  passport.use("login", new local.Strategy(
+    {
+      usernameField: "email",
+      //passReqToCallback: true,
+    },
+    async (username, password, done) => {
 
-            try {
-                const user = await usersDAO.getBy({ email: username });
+      try {
+        const user = await usersDAO.getBy({ email: username });
 
-                if (!user || !user.password) {
+        if (!user || !user.password) {
 
-                    return done(null, false)
-                }
-                //validacion de password con bcrypt
-              
-                
-               /*  try {
-                    let passwordValido = bcrypt.compareSync(password, user.password)
-                    if (!passwordValido){
-                    return done(null, false) } 
-
-                    return done (null, user)
-                    }
-                    catch(bcryptError){
-                    return done (bcryptError)
-                } */
-        
-            //armando el payload para el token
-               /*  const payload = {
-                    id: user._id,
-                    email: user.email,
-                    role: user.role || 'user'
-                };*/    const passwordValido = bcrypt.compareSync(password, user.password);
-          if (!passwordValido) {
-            return done(null, false);
-          }
-
-          return done(null, user);
-
-
-            } catch (error) { 
-                return done(error)
-
-            }
+          return done(null, false)
         }
-    )
-    )
+        //validacion de password con bcrypt
+
+
+         try {
+             let passwordValido = bcrypt.compareSync(password, user.password)
+             if (!passwordValido){
+             return done(null, false) } 
+
+             return done (null, user)
+             }
+             catch(bcryptError){
+             return done (bcryptError)
+         } 
+
+        //armando el payload para el token
+        /*  const payload = {
+             id: user._id,
+             email: user.email,
+             role: user.role || 'user'
+         };*/
+      /*   const passwordValido = bcrypt.compareSync(password, user.password);
+        if (!passwordValido) {
+          return done(null, false);
+        }
+ 
+        return done(null, user);*/
+
+
+      } catch (error) {
+        return done(error)
+
+      }
+    }
+  )
+  )
 
 }

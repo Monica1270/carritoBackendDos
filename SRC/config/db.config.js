@@ -28,7 +28,7 @@ const maskedURI = MONGODB_URI ? MONGODB_URI.replace(/:([^@]+)@/, ':****@'): '';
 
 // Manejadores de Eventos del Ciclo de Vida de la Conexión (Requerimiento del temario)
 db.on('connected', () => {
-  //console.log(`🟢 Mongoose: Conectado con éxito a MongoDB en: ${maskedURI}`);
+  console.log(`🟢 Mongoose: Conectado con éxito a MongoDB en: ${maskedURI}`);
 });
 
 db.on('error', (err) => {

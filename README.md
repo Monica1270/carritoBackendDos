@@ -215,10 +215,12 @@ proyecto-eventos/
 │   │   └── User.js         # Esquema de datos de Usuario (Mongoose)
 │   ├── routes/
 │   │   └── sessions.router.js     # Definición de rutas de autenticación
+│   │   └── events.router.js        # aplica ambos middlewares en las rutas protegidas
 │   ├── controllers/
 │   │   └── sessions.controller.js # Control de flujo y respuestas de sesión
 │   ├── middlewares/
 │   │   └── auth.middleware.js     # Protección de rutas y verificación de sesión
+│   │   └── authorize.middleware.js    # recibe roles permitidos → 403 si el rol no coincide 
 │   └── utils/
 │       ├── jwt.js          # Helpers para firmar y verificar JWT
 │       └── hash.js         # Utilidades de encriptación con Bcrypt
@@ -270,3 +272,15 @@ Modo producción: �AGENT_CODE_SEGMENT_6�
 | `POST` | `/api/sessions/login` | Inicio de sesión y generación de sesión/token | `{ "status": "success", "message": "..." }` |
 | `POST` | `/api/sessions/logout` | Cierre de sesión y destrucción de sesión/cookie | `{ "status": "success", "message": "..." }` |
 | `GET` | `/api/sessions/current` | Obtiene los datos del usuario logueado actualmente | `{ "status": "success", "user": {...} }` |
+
+
+### 5. Matriz de permisos
+Acción	                    user	organizer	admin
+Ver eventos	                  Sí	   Sí	    Sí
+Inscribirse a eventos	      Sí	Opcional	Opcional
+Crear eventos	              No	   Sí	     Sí
+Editar eventos propios	      No	   Sí	     Sí
+Editar cualquier evento	      No	   No	     Sí
+Administrar categorías	      No	   No	     Sí
+Ver todos los usuarios	      No	   No	     Sí
+Cambiar roles	              No	   No	     Sí

@@ -1,7 +1,7 @@
 import express from "express";
 import { ProductsDao } from "../dao/productsDaos.js";
 import { validateProductBody } from "../middlewares/validation.Middleware.js";
-import { logger } from "../middlewares/log.js";
+import { logger } from "../middlewares/logger.js";
 import { auth } from "../middlewares/auth.js";
 
 const router = express.Router();

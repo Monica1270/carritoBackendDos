@@ -3,6 +3,7 @@ import productsRouter from './routes/productsRouter.js';
 import { config } from './config/config.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { auth } from './middlewares/auth.js';
+import { logger } from './middlewares/logger.js';
 import { Product } from './models/Product.models.js';
 import  user  from './models/user.js';
 import { connectDB } from './config/db.config.js';
@@ -15,6 +16,7 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import { inicializarPassport } from './config/passport.config.js';
+import {initPassport} from './config/passport.config.js';
 import MongoStore from 'connect-mongo';
 import { router as sessionsRouter } from './routes/sessionsRouter.js';
 import { fileURLToPath } from 'url';
@@ -35,11 +37,12 @@ connectDB();
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(passport.initialize());
-inicializarPassport()
+app.use(cookieParser());
+/* app.use(passport.initialize());
+initPassport();
 app.use(cookieParser());
 app.use(passport.initialize());
-
+ */
 //manejo de sesiones con MongoDB
 app.use(sessions({
   secret: config.general.SECRET,
@@ -52,7 +55,10 @@ app.use(sessions({
   }),
 }));
 
-
+//2.segundo las sesiones se inicializan con passport
+initPassport();
+inicializarPassport();
+app.use(passport.initialize());
 app.use('/api/sessions', sessionsRouter);
 app.get("/error", (req, res)=>{
 
@@ -84,8 +90,33 @@ app.engine('handlebars', engine({
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'view'));
 
+
+app.get(
+    "/datos1", //Gestión de Ropa y Stock,ver ventas y reportes financieros,
+    passport.authenticate("current", {session: false, failureRedirect: "/error"}), 
+    auth("admin", "manager"), 
+    (req, res)=>{
+
+        res.setHeader('Content-Type','application/json');
+        return res.status(200).json({payload:"datos 1"});
+    }
+)
+
+app.get(
+    "/datos2", // ver catalogo, ver historial 
+    passport.authenticate("current", {session: false, failureRedirect: "/error"}), 
+    auth("user", "manager"), 
+    (req, res)=>{
+
+        res.setHeader('Content-Type','application/json');
+        return res.status(200).json({payload:"datos 2"});
+    }
+)
+
  app.get("/pruebas",
+  logger,
   passport.authenticate("current", {session:false, failureRedirect:"/error"}),
+  auth('user', 'admin', 'manager'),/*👈esto es tipo una funcion que viene desde el auth*/
  (req, res) => {
   console.log(req.headers);
   console.log(req.cookies);
@@ -133,7 +164,7 @@ app.get('/test', (req, res) => {
 // ===================== RUTAS DE AUTENTICACIÓN ADAPTADAS A MONGOOSE =====================
 
 // 1. RUTA DE REGISTRO (Corregida con async/await y hashPassword)
-app.post('/registro', async (req, res, next) => {
+/* app.post('/registro', async (req, res, next) => {
     try {
         let { nombre, first_name, last_name, email, password } = req.body;
         const firstName = first_name || nombre;
@@ -204,7 +235,7 @@ app.post('/login', async (req, res, next) => {
         next(error);
     }
 });
-
+ */
 // 3. RUTA DE PERFIL (Protegida por tu middleware auth)
 app.get('/usuario', auth, (req, res) => {
     res.setHeader('Content-Type', 'application/json');
