@@ -1,5 +1,6 @@
 import express from 'express';
 import productsRouter from './routes/productsRouter.js';
+import eventsRouter from './routes/events.router.js';
 import { config } from './config/config.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { auth } from './middlewares/auth.js';
@@ -75,6 +76,7 @@ app.get("/logout", (req, res)=>{
 
 
 app.use('/api/products', productsRouter);
+app.use('/api/events', eventsRouter);
 
 //Motor de plantillas Handlebars
 app.engine('handlebars', engine({

@@ -1,286 +1,107 @@
-# 🎟️ Plataforma de Gestión de Eventos - API REST (Backend II)
+# 🛒 App de Venta de Ropa Deportiva, Zapatillas y Cuadros - Módulo Events 🔟
 
-API REST desarrollada con **Node.js** y **Express** para la gestión integral de eventos, usuarios e inscripciones, estructurada bajo un patrón de diseño en capas para garantizar modularidad, mantenibilidad y escalabilidad.
+Este repositorio contiene la pre-entrega del módulo de **Gestión de Eventos y Logística Comercial** para la materia Backend 2. La aplicación está diseñada bajo el estándar de una API RESTful e implementa control de accesos por rol (RBAC), filtros avanzados con expresiones regulares, paginación nativa y lógica de negocio automatizada para envíos.
 
 ---
-##🏛️ Arquitectura del Proyecto (Diseño en Capas)
 
-El proyecto sigue una separación estricta de responsabilidades organizada dentro del directorio `src/`:
+## 🏛️ Arquitectura del Proyecto (Diseño en Capas)
 
-- **`src/config/`**: Configuración centralizada de variables de entorno (`dotenv`) y conexión a MongoDB (`Mongoose`).
-- **`src/routes/`**: Definición de rutas y endpoints de la API (`events.router.js`, `sessions.router.js`).
-- **`src/controllers/`**: Recepción de peticiones HTTP (`req`), delegación a la capa de servicios y retorno de respuestas normalizadas (`res`).
-- **`src/services/`**: Implementación de las reglas y lógica de negocio de la aplicación.
-- **`src/repositories/`**: Capa intermedia que desacopla la lógica de negocio de la fuente de datos (Patrón Repository).
-- **`src/dao/`**: Data Access Object para la interacción directa con la base de datos.
-- **`src/models/`**: Definición de esquemas y modelos de Mongoose (`User.js`, `Event.js`).
-- **`src/middlewares/`**: Middlewares globales y de ruta (autenticación, validación, manejo centralizado de errores).
-- **`src/utils/`**: Funciones auxiliares y herramientas utilitarias.
-- **`src/app.js`**: Configuración de Express, middlewares base y montaje de routers.
-- **`src/server.js`**: Punto de entrada que inicializa la base de datos y levanta el servidor HTTP.
+El proyecto sigue una separación estricta de responsabilidades organizada dentro del directorio `src/` utilizando **ES Modules (ESM)**:
+
+*   📂 **`src/config/`**: Configuración centralizada de variables de entorno (`dotenv`) y conexión a MongoDB Atlas mediante Mongoose (`db.config.js`).
+*   📂 **`src/routes/`**: Definición de rutas y endpoints de la API (`events.router.js`, `sessionsRouter.js`).
+*   📂 **`src/controllers/`**: Recepción de peticiones HTTP, extracción de parámetros (`req.query`, `req.body`, `req.user`) y retorno de respuestas normalizadas (`res`).
+*   📂 **`src/models/`**: Definición de esquemas y modelos de Mongoose optimizados con `trim` y `versionKey: false` (`event.model.js`, `user.js`).
+*   📂 **`src/middlewares/`**: Middlewares globales de ruta (Autenticación por cookies y Passport, control de roles, logger y manejo centralizado de errores).
+*   📂 **`src/app.js`**: Configuración y arranque de Express, inicialización de Passport, inyección de cookies y montaje de ruteadores centrales.
 
 ---
 
 ## 📦 Tecnologías Utilizadas
 
-- **Node.js** (Módulos ES - ESM)
-- **Express.js**
-- **MongoDB** & **Mongoose**
-- **Dotenv**
-- **JSON Web Tokens (JWT)** / **Bcrypt** (Autenticación y seguridad)
-- **cookie-parser
-- **passport
-- **passport-jwt
-- **passport-local
-
+*   **Runtime:** Node.js v22 (Modos nativos `--watch`)
+*   **Framework:** Express.js
+*   **Base de Datos & ORM:** MongoDB & Mongoose
+*   **Autenticación & Seguridad:** JWT (JSON Web Tokens) / Bcrypt / Passport JWT (`strategy: current`)
+*   **Herramientas Base:** Cookie-parser / Express-session / Connect-mongo (Persistencia de sesiones)
+*   **Renderizado Opcional:** Express-Handlebars
 
 ---
 
-## 📁 Estructura del Directorio
+## 📋 Criterios de Aceptación del Modelo Event
 
-```text
-## 📁 Estructura de los Proyectos
+El esquema de datos para los eventos en Mongoose (`event.model.js`) implementa las siguientes restricciones nativas:
 
-El ecosistema está compuesto por dos soluciones desarrolladas bajo una arquitectura limpia y organizada en capas:
+*   **Campos obligatorios:** `title`, `description`, `category`, `location`, `deliveryMethod`, `deliveryDate`.
+*   **Restricciones numéricas:** `capacity` debe ser estrictamente mayor a cero (`min: 1`). `price` debe ser mayor o igual a cero (`min: 0`).
+*   **Estados permitidos (status):** Exclusivamente `draft`, `published`, `cancelled` o `finished`.
+*   **Relación de Organizador (organizer):** Es una referencia directa por `ObjectId` al modelo de usuario (`User`), garantizando la integridad de los datos.
 
-### 1. Sistema Principal (`carritoBackendDos/`)
-Utiliza un patrón robusto con separación por **DAO (Data Access Objects)** y **Repositorios** para desacoplar totalmente la base de datos de la lógica de negocio.
+---
 
-```text
-carritoBackendDos/
-├── src/
-│   ├── config/             # Configuración de entorno y conexión a BD
-│   ├── controllers/        # Controladores (Events, Sessions, index)
-│   ├── dao/                # Data Access Objects (Persistencia)
-│   │     └── models/       # Modelo de usuario específico del DAO
-│   ├── dto/                # Data Transfer Objects (Transformación de datos)
-│   ├── middlewares/        # Middlewares de aplicación y ruta
-│   ├── models/             # Modelos de datos globales (Event, User)
-│   ├── repositories/       # Repositorios (Capa de abstracción de datos)
-│   ├── routes/             # Enrutadores principales (Definición de rutas)
-│   ├── services/           # Lógica de negocio avanzada
-│   ├── utils/              # Utilidades globales y funciones helper
-│   ├── app.js              # Configuración y Middlewares de Express
-│   └── server.js           # Inicialización y escucha del servidor HTTP
-├── .env.example            # Plantilla de variables de entorno
-├── .gitignore              # Archivos ignorados por Git
-├── package.json            # Dependencias y scripts del proyecto
-└── README.md               # Documentación del sistema
+## 📌 Endpoints de Eventos (`/api/events`)
+
+Todos los endpoints responden e interactúan emitiendo cabeceras normadas `Content-Type: application/json`.
+
+| Método | Ruta | Acceso | Descripción |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/events` | 🌐 Público | Lista eventos con filtros avanzados, ordenamiento y paginación. |
+| **GET** | `/api/events/:id` | 🌐 Público | Obtiene el detalle de un evento específico por ID. |
+| **POST** | `/api/events` | 🔑 `organizer`, `admin` | Crea un nuevo evento con validación logística automatizada. |
+| **PUT** | `/api/events/:id` | 🔐 Dueño o `admin` | Modifica de forma general los campos de un evento. |
+| **PATCH** | `/api/events/:id/status` | 🔐 Dueño o `admin` | Modifica únicamente las transiciones de estado del evento. |
+
+---
+
+## 🛠️ Reglas de Negocio Principales (Capa de Controladores / Modelos)
+
+### 🆕 Creación de Eventos
+*   **Asignación de Organizador:** El campo `organizer` se extrae e inyecta de forma automática en el backend leyendo el token de la cookie (`req.user.id`). Se rechaza cualquier intento de enviarlo manualmente en el `body`.
+*   **Fechas Futuras:** No se permite la creación de eventos con fechas de realización anteriores al día de hoy.
+*   **Logística en Castellano (Costo de Envío):** Si el cliente selecciona como método de entrega `"Envío a domicilio"`, el backend calcula e inyecta de manera automática un cargo fijo de **\$20.000** en el campo `costoEnvio`. Si selecciona `"Retiro del local"`, el costo se computa automáticamente en **\$0**.
+
+### ✏️ Modificaciones, Permisos y Estados
+*   **Control de Propiedad:** Un usuario con rol `organizer` está bloqueado para modificar eventos creados por otros usuarios. El rol `admin` posee permisos globales.
+*   **Inmutabilidad de Cancelados:** Un evento en estado `cancelled` entra en modo de solo lectura. Se rechaza cualquier intento posterior de modificación física o cambio de estado.
+*   **Borrado Lógico:** Cancelar un evento consiste únicamente en cambiar su estado a `cancelled`; bajo ninguna circunstancia se eliminan físicamente registros de la base de datos.
+*   **Restricción de Publicación:** No se permite pasar a estado `published` aquellos eventos que ya se encuentren en estado `finished` o `cancelled`.
+
+---
+
+## 🔍 Listado con Filtros y Paginación
+
+El endpoint de lectura masiva soporta query params avanzados para segmentar la información:
+*   **Filtros directos:** `status`, `category` (por ObjectId).
+*   **Coincidencia Parcial:** `location` (búsqueda case-insensitive mediante Expresiones Regulares).
+*   **Rango de fechas:** Filtrado cronológico selectivo mediante `dateFrom` y `dateTo`.
+*   **Ordenamiento:** Clasificación flexible de registros (Ejemplos: `?sort=date` o `?sort=-price`).
+*   **Paginación:** Propiedades controladas mediante `page` (página actual) y `limit` (registros por lote).
+
+### 📄 Estructura de Respuesta Normalizada (Caso Exitoso 200)
+```json
+{
+  "status": "success",
+  "data": [ ... ],
+  "page": 1,
+  "limit": 10,
+  "total": 45,
+  "totalPages": 5
+}
 ```
 
-### 2. Módulo de Autenticación (`proyecto-eventos/`)
-Una estructura ágil enfocada en la gestión de sesiones mediante **JWT (JSON Web Tokens)** y persistencia directa con **Mongoose**.
-
-```text
-proyecto-eventos/
-├── src/
-│   ├── app.js              # Punto de entrada y configuración de Express
-│   ├── config/
-│   │   └── db.js           # Conexión centralizada a MongoDB
-│   ├── models/
-│   │   └── User.js         # Esquema de datos de Usuario (Mongoose)
-│   ├── routes/
-│   │   └── sessions.router.js     # Definición de rutas de autenticación
-│   ├── controllers/
-│   │   └── sessions.controller.js # Control de flujo y respuestas de sesión
-│   ├── middlewares/
-│   │   └── auth.middleware.js     # Protección de rutas y verificación de sesión
-│   └── utils/
-│       ├── jwt.js          # Helpers para firmar y verificar JWT
-│       └── hash.js         # Utilidades de encriptación con Bcrypt
-├── .env.example            # Plantilla de variables de entorno
-├── .gitignore              # Archivos ignorados por Git
-├── package.json            # Scripts y dependencias (Bcrypt, JWT, Mongoose)
-└── README.md               # Documentación del módulo
-```
----
-##🔧 Instalación y Puesta en Marcha
-### 1. Clonar el repositorio
-'''bash
-git clone <URL_DE_TU_REPOSITORIO>
-cd carritoBackendDos
-'''
-
-### 2. Instalar dependencias
-'''bash
-npm install
-'''
-
-### 3. Configurar variables de entorno
-Crea un archivo .env en la raíz del proyecto basándote en .env.example:
-'''bash
-cp .env.example .env
-'''
-Variables requeridas en .env:
-'''env
-PORT=8080
-NODE_ENV=development
-MONGO_URI=mongodb+srv://<usuario>:<password>@cluster0.mongodb.net/entregaFinalB?retryWrites=true&w=majority
-DB_NAME=entregaFinalB
-JWT_SECRET=tuClaveSecretaParaTokens
-'''
-
-### 4. Ejecutar el servidor
--**Modo desarrollo (con recarga automática):**
-'''bash
-npm run dev
-'''
--**Modo producción:**
-'''bash
-npm start
-'''
-
-## 📌 Endpoints Base Disponibles
-
-# 🎟️ Plataforma de Gestión de Eventos - API REST (Backend II)
-
-API REST desarrollada con **Node.js** y **Express** para la gestión integral de eventos, usuarios e inscripciones, estructurada bajo un patrón de diseño en capas para garantizar modularidad, mantenibilidad y escalabilidad.
-
----
-##🏛️ Arquitectura del Proyecto (Diseño en Capas)
-
-El proyecto sigue una separación estricta de responsabilidades organizada dentro del directorio `src/`:
-
-- **`src/config/`**: Configuración centralizada de variables de entorno (`dotenv`) y conexión a MongoDB (`Mongoose`).
-- **`src/routes/`**: Definición de rutas y endpoints de la API (`events.router.js`, `sessions.router.js`).
-- **`src/controllers/`**: Recepción de peticiones HTTP (`req`), delegación a la capa de servicios y retorno de respuestas normalizadas (`res`).
-- **`src/services/`**: Implementación de las reglas y lógica de negocio de la aplicación.
-- **`src/repositories/`**: Capa intermedia que desacopla la lógica de negocio de la fuente de datos (Patrón Repository).
-- **`src/dao/`**: Data Access Object para la interacción directa con la base de datos.
-- **`src/models/`**: Definición de esquemas y modelos de Mongoose (`User.js`, `Event.js`).
-- **`src/middlewares/`**: Middlewares globales y de ruta (autenticación, validación, manejo centralizado de errores).
-- **`src/utils/`**: Funciones auxiliares y herramientas utilitarias.
-- **`src/app.js`**: Configuración de Express, middlewares base y montaje de routers.
-- **`src/server.js`**: Punto de entrada que inicializa la base de datos y levanta el servidor HTTP.
-
 ---
 
-## 📦 Tecnologías Utilizadas
+## 🧪 Casos de Prueba (QA Checklist Evaluado)
 
-- **Node.js** (Módulos ES - ESM)
-- **Express.js**
-- **MongoDB** & **Mongoose**
-- **Dotenv**
-- **JSON Web Tokens (JWT)** / **Bcrypt** (Autenticación y seguridad)
-- **cookie-parser
-- **passport
-- **passport-jwt
-- **passport-local
+Las siguientes pruebas técnicas fueron validadas mediante Postman garantizando el comportamiento de los códigos HTTP correspondientes:
 
-
----
-
-## 📁 Estructura del Directorio
-
-```text
-## 📁 Estructura de los Proyectos
-
-El ecosistema está compuesto por dos soluciones desarrolladas bajo una arquitectura limpia y organizada en capas:
-
-### 1. Sistema Principal (`carritoBackendDos/`)
-Utiliza un patrón robusto con separación por **DAO (Data Access Objects)** y **Repositorios** para desacoplar totalmente la base de datos de la lógica de negocio.
-
-```text
-carritoBackendDos/
-├── src/
-│   ├── config/             # Configuración de entorno y conexión a BD
-│   ├── controllers/        # Controladores (Events, Sessions, index)
-│   ├── dao/                # Data Access Objects (Persistencia)
-│   │     └── models/       # Modelo de usuario específico del DAO
-│   ├── dto/                # Data Transfer Objects (Transformación de datos)
-│   ├── middlewares/        # Middlewares de aplicación y ruta
-│   ├── models/             # Modelos de datos globales (Event, User)
-│   ├── repositories/       # Repositorios (Capa de abstracción de datos)
-│   ├── routes/             # Enrutadores principales (Definición de rutas)
-│   ├── services/           # Lógica de negocio avanzada
-│   ├── utils/              # Utilidades globales y funciones helper
-│   ├── app.js              # Configuración y Middlewares de Express
-│   └── server.js           # Inicialización y escucha del servidor HTTP
-├── .env.example            # Plantilla de variables de entorno
-├── .gitignore              # Archivos ignorados por Git
-├── package.json            # Dependencias y scripts del proyecto
-└── README.md               # Documentación del sistema
-```
-
-### 2. Módulo de Autenticación (`proyecto-eventos/`)
-Una estructura ágil enfocada en la gestión de sesiones mediante **JWT (JSON Web Tokens)** y persistencia directa con **Mongoose**.
-
-```text
-proyecto-eventos/
-├── src/
-│   ├── app.js              # Punto de entrada y configuración de Express
-│   ├── config/
-│   │   └── db.js           # Conexión centralizada a MongoDB
-│   ├── models/
-│   │   └── User.js         # Esquema de datos de Usuario (Mongoose)
-│   ├── routes/
-│   │   └── sessions.router.js     # Definición de rutas de autenticación
-│   │   └── events.router.js        # aplica ambos middlewares en las rutas protegidas
-│   ├── controllers/
-│   │   └── sessions.controller.js # Control de flujo y respuestas de sesión
-│   ├── middlewares/
-│   │   └── auth.middleware.js     # Protección de rutas y verificación de sesión
-│   │   └── authorize.middleware.js    # recibe roles permitidos → 403 si el rol no coincide 
-│   └── utils/
-│       ├── jwt.js          # Helpers para firmar y verificar JWT
-│       └── hash.js         # Utilidades de encriptación con Bcrypt
-├── .env.example            # Plantilla de variables de entorno
-├── .gitignore              # Archivos ignorados por Git
-├── package.json            # Scripts y dependencias (Bcrypt, JWT, Mongoose)
-└── README.md               # Documentación del módulo
-```
-
-'''
----
-##🔧 Instalación y Puesta en Marcha
-### 1. Clonar el repositorio
-'''bash
-git clone <URL_DE_TU_REPOSITORIO>
-cd carritoBackendDos
-'''
-
-### 2. Instalar dependencias
-'''bash
-npm install
-'''
-
-### 3. Configurar variables de entorno
-Crea un archivo .env en la raíz del proyecto basándote en .env.example:
-'''bash
-cp .env.example .env
-'''
-Variables requeridas en .env:
-'''env
-PORT=8080
-NODE_ENV=development
-MONGO_URI=mongodb+srv://<usuario>:<password>@cluster0.mongodb.net/entregaFinalB?retryWrites=true&w=majority
-DB_NAME=entregaFinalB
-JWT_SECRET=tuClaveSecretaParaTokens
-'''
-
-### 4. Ejecutar el servidor
-Modo desarrollo (con recarga automática): �AGENT_CODE_SEGMENT_5�
-Modo producción: �AGENT_CODE_SEGMENT_6�
-
-## 📌 Endpoints Base Disponibles
-
-| Método | Endpoint | Descripción | Respuesta Exitosa (Estructura) |
-|---|---|---|---|
-| `GET` | `/api/health` | Estado y verificación de actividad del servidor | `{ "status": "ok", "message": "..." }` |
-| `GET` | `/api/events` | Listado inicial de eventos | `{ "status": "success", "payload": [] }` |
-| `POST` | `/api/sessions/register` | Registro de nuevos usuarios (Usa `UsersDTO`) | `{ "status": "success", "message": "...", "newUser": {...} }` |
-| `POST` | `/api/sessions/login` | Inicio de sesión y generación de sesión/token | `{ "status": "success", "message": "..." }` |
-| `POST` | `/api/sessions/logout` | Cierre de sesión y destrucción de sesión/cookie | `{ "status": "success", "message": "..." }` |
-| `GET` | `/api/sessions/current` | Obtiene los datos del usuario logueado actualmente | `{ "status": "success", "user": {...} }` |
-
-
-### 5. Matriz de permisos
-Acción	                    user	organizer	admin
-Ver eventos	                  Sí	   Sí	    Sí
-Inscribirse a eventos	      Sí	Opcional	Opcional
-Crear eventos	              No	   Sí	     Sí
-Editar eventos propios	      No	   Sí	     Sí
-Editar cualquier evento	      No	   No	     Sí
-Administrar categorías	      No	   No	     Sí
-Ver todos los usuarios	      No	   No	     Sí
-Cambiar roles	              No	   No	     Sí
+1.  **Restricción de Rol en Creación:** Intentar crear un evento autenticado con rol `user` → Retorna **403 Forbidden**.
+2.  **Validación de Fecha Pasada:** Intentar crear un evento con fecha de ayer → Retorna **400 Bad Request**.
+3.  **Validación de Capacidad:** Intentar crear un evento con `capacity: 0` → Retorna **400 Bad Request**.
+4.  **Costo de Logística Automatizado:** Crear un evento con `"deliveryMethod": "Envío a domicilio"` → El sistema responde con **201 Created** inyectando de forma segura el campo `"costoEnvio": 20000`.
+5.  **Permiso de Propietario:** Modificar un evento propio siendo el `organizer` original → Retorna **200 OK**.
+6.  **Bloqueo Organizador Ajeno:** Intentar modificar un evento ajeno siendo un `organizer` distinto → Retorna **403 Forbidden**.
+7.  **Permiso de Administrador:** Modificar el evento de cualquier organizador utilizando el rol `admin` → Retorna **200 OK**.
+8.  **Bloqueo por Estado Cancelado:** Intentar alterar un campo de un evento cuyo estado ya es `cancelled` → Retorna **400 Bad Request**.
+9.  **Eficacia de Filtros:** Ejecutar la consulta `?status=published&page=1&limit=5` → Retorna el array de datos paginado y filtrado correctamente.
+10. **Entidad Inexistente:** Consultar un evento con un ID válido de MongoDB pero que no pertenece a ningún registro → Retorna **404 Not Found**.
