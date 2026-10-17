@@ -194,6 +194,19 @@ class EventsService {
     await event.save();
     return event.toObject();
   }
+    // 6. ELIMINAR EVENTO (DELETE)
+  async deleteEvent(id, actor) {
+    if (!mongoose.isValidObjectId(id)) throw new HttpError(400, "Id de evento inválido");
+    
+    const event = await EventModel.findById(id);
+    if (!event) throw new HttpError(404, "Evento no encontrado");
+
+    this.assertOwnerOrAdmin(event, actor);
+
+    await EventModel.findByIdAndDelete(id);
+    return { message: "Evento eliminado exitosamente", id };
+  }
+
 }
 
 export const eventsService = new EventsService();

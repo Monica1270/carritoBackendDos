@@ -20,4 +20,7 @@ router.put("/:id",auth("admin", "organizer"),EventsController.update);
 
 router.patch("/:id/status",auth("admin", "organizer", "user"),EventsController.changeStatus);
 
+router.delete("/:id", auth("admin", "organizer"), EventsController.remove);
+
+
 export default router;

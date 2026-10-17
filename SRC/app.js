@@ -16,6 +16,7 @@ import sessions from 'express-session';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
+import ticketsRouter from './routes/tickets.routes.js';
 import { inicializarPassport } from './config/passport.config.js';
 import {initPassport} from './config/passport.config.js';
 import MongoStore from 'connect-mongo';
@@ -39,11 +40,6 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-/* app.use(passport.initialize());
-initPassport();
-app.use(cookieParser());
-app.use(passport.initialize());
- */
 //manejo de sesiones con MongoDB
 app.use(sessions({
   secret: config.general.SECRET,
@@ -77,7 +73,7 @@ app.get("/logout", (req, res)=>{
 
 app.use('/api/products', productsRouter);
 app.use('/api/events', eventsRouter);
-
+app.use('/api/tickets', ticketsRouter);
 //Motor de plantillas Handlebars
 app.engine('handlebars', engine({
   defaultLayout: 'main',
@@ -163,81 +159,7 @@ app.get('/test', (req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   res.status(200).send({ message: 'Test OK' });
 });
-// ===================== RUTAS DE AUTENTICACIÓN ADAPTADAS A MONGOOSE =====================
 
-// 1. RUTA DE REGISTRO (Corregida con async/await y hashPassword)
-/* app.post('/registro', async (req, res, next) => {
-    try {
-        let { nombre, first_name, last_name, email, password } = req.body;
-        const firstName = first_name || nombre;
-        const lastName = last_name || 'Apellido';
-
-        if (!firstName || !email || !password) {
-            return res.status(400).json({ message: 'Ingrese nombre, email y password' });
-        }
-
-        let usuarioExistente = await user.findOne({ email });
-        if (usuarioExistente) return res.status(400).json({ message: `El usuario ${email} ya existe` });
-
-        const hashedPassword = hashPassword(password);
-
-        let usuarioCreado = await user.create({
-            first_name: firstName,
-            last_name: lastName,
-            email,
-            password: hashedPassword
-        });
-
-        let respuestaUsuario = usuarioCreado.toObject();
-        delete respuestaUsuario.password;
-
-        res.status(201).json({
-            usuarioCreado: respuestaUsuario
-        });
-    } catch (error) {
-        next(error);
-    }
-});
-  
-// 2. RUTA DE LOGIN (Corregida con validaHash y config.general.SECRET)
-app.post('/login', async (req, res, next) => {
-    try {
-        let { email, password } = req.body;
-        if (!email || !password) {
-          return res.status(400).json({ message: 'Ingrese email y password' });
-        }
-
-        let usuario = await user.findOne({ email });
-        if (!usuario) {
-          return res.status(400).json({ message: 'Error credenciales' });
-        }
-
-        const isMatch = validaHash(password, usuario.password);
-        if (!isMatch) return res.status(400).json({ message: 'Error credenciales' });
-
-        let usuarioPlano = usuario.toObject();
-        delete usuarioPlano.password;
-        usuarioPlano.id = usuario._id;
-        usuarioPlano.first_name = usuario.first_name;
-        usuarioPlano.last_name = usuario.last_name;
-
-        let token = jwt.sign({
-            id: usuario._id,
-            email: usuario.email,
-            role: usuario.role || 'user'
-        }, config.general.JWT_SECRET, { expiresIn: "1h" });
-
-        return res.status(200).json({
-            status: 'success',
-            message: `Login exitoso para ${usuario.first_name}`,
-            user: usuarioPlano,
-            token
-        });
-    } catch (error) {
-        next(error);
-    }
-});
- */
 // 3. RUTA DE PERFIL (Protegida por tu middleware auth)
 app.get('/usuario', auth, (req, res) => {
     res.setHeader('Content-Type', 'application/json');

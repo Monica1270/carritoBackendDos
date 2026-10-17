@@ -6,16 +6,34 @@ Este repositorio contiene la pre-entrega del módulo de **Gestión de Eventos y 
 
 ## 🏛️ Arquitectura del Proyecto (Diseño en Capas)
 
-El proyecto sigue una separación estricta de responsabilidades organizada dentro del directorio `src/` utilizando **ES Modules (ESM)**:
+## 📂 Estructura del Directorio `src/`
 
-*   📂 **`src/config/`**: Configuración centralizada de variables de entorno (`dotenv`) y conexión a MongoDB Atlas mediante Mongoose (`db.config.js`).
-*   📂 **`src/routes/`**: Definición de rutas y endpoints de la API (`events.router.js`, `sessionsRouter.js`).
-*   📂 **`src/controllers/`**: Recepción de peticiones HTTP, extracción de parámetros (`req.query`, `req.body`, `req.user`) y retorno de respuestas normalizadas (`res`).
-*   📂 **`src/models/`**: Definición de esquemas y modelos de Mongoose optimizados con `trim` y `versionKey: false` (`event.model.js`, `user.js`).
-*   📂 **`src/middlewares/`**: Middlewares globales de ruta (Autenticación por cookies y Passport, control de roles, logger y manejo centralizado de errores).
-*   📂 **`src/app.js`**: Configuración y arranque de Express, inicialización de Passport, inyección de cookies y montaje de ruteadores centrales.
+Toda la aplicación está construida utilizando **ES Modules (ESM)** y organizada bajo una arquitectura en capas:
 
----
+```text
+src/
+├── config/         # Variables de entorno y conexiones
+├── controllers/    # Controladores HTTP (req, res)
+├── dao/            # Capa de acceso a datos (Persistencia)
+├── middlewares/    # Filtros de seguridad, roles y errores
+├── models/         # Esquemas y modelos de Mongoose
+├── routes/         # Definición de endpoints de la API
+├── services/       # Lógica de negocio centralizada
+├── utils/          # Helpers y servicios externos (Mailer)
+└── app.js          # Punto de entrada de la aplicación
+```
+
+### 📝 Detalle de Componentes y Capas
+
+*   **`config/`**: Configuración centralizada de variables de entorno (`dotenv`) y conexión a MongoDB Atlas mediante Mongoose (`db.config.js`).
+*   **`controllers/`**: Recepción de peticiones HTTP, extracción de parámetros (`req.query`, `req.body`, `req.user`) y retorno de respuestas normalizadas (`tickets.controller.js`, `users.controller.js`).
+*   **`dao/`**: Capa de persistencia aislada para el acceso directo a la base de datos utilizando el patrón DAO (`tickets.dao.js`, `users.dao.js`).
+*   **`middlewares/`**: Funciones intermedias globales y de ruta que manejan la autenticación (cookies y Passport), control de roles, logger del sistema y gestión centralizada de errores.
+*   **`models/`**: Definición de esquemas de Mongoose optimizados con configuraciones de limpieza de datos como `trim` y `versionKey: false` (`ticket.model.js`, `user.model.js`, `event.model.js`).
+*   **`routes/`**: Enrutadores de la API que asocian las rutas y verbos HTTP con sus controladores correspondientes (`tickets.router.js`, `users.router.js`).
+*   **`services/`**: Orquestación de la lógica de negocio pura del sistema, aislando las reglas operativas de la capa de transporte HTTP (`tickets.service.js`).
+*   **`utils/`**: Herramientas genéricas de asistencia, funciones hash y servicios externos de mensajería (`mailer.util.js` con Nodemailer).
+*   **`app.js`**: Archivo principal del servidor. Inicializa Express, inyecta middlewares base (cookies, Passport), monta los enrutadores centrales y arranca la aplicación.
 
 ## 📦 Tecnologías Utilizadas
 

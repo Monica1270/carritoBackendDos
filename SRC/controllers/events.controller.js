@@ -45,3 +45,13 @@ export const changeStatus = async (req, res, next) => {
     next(error);
   }
 };
+export const remove = async (req, res, next) => {
+  try {
+    const deleted = await eventsService.deleteEvent(req.params.id, req.user);
+    return res.status(200).json({ status: 'success', payload: deleted });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
